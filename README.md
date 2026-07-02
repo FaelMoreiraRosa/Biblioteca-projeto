@@ -1,125 +1,106 @@
-#  Sistema de Gerenciamento de Biblioteca — Projeto 2
+Aqui está o conteúdo completo em Markdown, limpo, sem o excesso de emojis e pronto para você copiar e colar direto no seu arquivo `README.md`:
 
-API REST em **Node.js/Express + Sequelize (PostgreSQL)**, autenticação **JWT**,
-documentação **Swagger** e frontend em **React** (Vite).
+```markdown
+# Sistema de Gerenciamento de Biblioteca (Projeto II)
+
+Este projeto foi desenvolvido como requisito avaliativo para a disciplina de Desenvolvimento Backend na UTFPR. A aplicação consiste em um sistema completo de gerenciamento de biblioteca, unindo uma API REST robusta a uma interface SPA dinâmica e responsiva.
+
+O objetivo principal foi aplicar na prática conceitos de arquitetura de software, controle de acesso baseado em funções (RBAC), persistência de dados relaciais e consumo de APIs seguras.
 
 ---
 
-## Estrutura
+## Tecnologias Utilizadas
 
-```
+* **Backend:** Node.js, Express, Sequelize ORM, PostgreSQL, JWT (JSON Web Token) e Swagger UI.
+* **Frontend:** React (Vite), JavaScript (ES6+), Axios e Context API.
+
+---
+
+## Estrutura do Repositório
+
+```text
 biblioteca-projeto2/
-├── backend/     API REST (Express + Sequelize + JWT + Swagger)
-└── frontend/    Interface React (Vite)
+├── backend/      # API REST (Express + Sequelize)
+└── frontend/     # Interface em React (Vite)
+
 ```
 
 ---
 
-## 1. Pré-requisitos
+## Como Executar o Projeto
 
-- Node.js 18+
-- PostgreSQL rodando localmente (ou ajuste `DB_DIALECT` para `mysql` + instale `mysql2` se preferir MySQL)
+### 1. Pré-requisitos
 
----
+* Node.js (versão 18 ou superior)
+* PostgreSQL rodando localmente (caso prefira utilizar MySQL, altere o `DB_DIALECT` para `mysql` e instale o pacote `mysql2`).
 
-## 2. Rodando o Backend
+### 2. Configurando o Backend
+
+Navegue até a pasta do backend, instale as dependências e configure as variáveis de ambiente:
 
 ```bash
 cd backend
 npm install
-cp .env.example .env      # depois edite com as credenciais do seu banco
+cp .env.example .env  # Abra o arquivo .env e insira as credenciais do seu banco
+
 ```
 
-Crie o banco de dados vazio (ex.: `biblioteca-bd`) e rode:
+Com o banco de dados vazio criado (exemplo: `biblioteca-bd`), execute as migrações e os seeds para popular as tabelas iniciais:
 
 ```bash
-npx sequelize-cli db:create      # (opcional, se o banco ainda não existir)
-npm run migrate                  # cria as tabelas
-npm run seed                     # popula com os usuários/leitores/livros obrigatórios
-npm run dev                      # inicia o servidor em http://localhost:3000
+npx sequelize-cli db:create  # Opcional, caso o banco ainda não exista
+npm run migrate             # Cria a estrutura de tabelas
+npm run seed                # Insere dados obrigatórios de teste
+npm run dev                 # Inicia o servidor local
+
 ```
 
-- API: `http://localhost:3000`
-- Documentação Swagger: `http://localhost:3000/api-docs`
+* **API Local:** `http://localhost:3000`
+* **Documentação Swagger:** `http://localhost:3000/api-docs`
 
-### Contas criadas pelo seed (senha `123456` para todas)
+#### Contas de Teste (Senha padrão: `123456`)
 
-| Perfil         | E-mail                        |
-|----------------|--------------------------------|
-| Administrador  | admin@biblioteca.com          |
-| Bibliotecário  | bibliotecario@biblioteca.com  |
-| Leitor         | ana.souza@aluno.com           |
-| Leitor         | bruno.lima@aluno.com          |
+| Perfil | E-mail |
+| --- | --- |
+| **Administrador** | admin@biblioteca.com |
+| **Bibliotecário** | bibliotecario@biblioteca.com |
+| **Leitor** | ana.souza@aluno.com |
+| **Leitor** | bruno.lima@aluno.com |
 
-Também são criados 3 livros de exemplo para facilitar a demonstração.
+*Nota: O seed também cadastra 3 livros iniciais para demonstração. Se precisar resetar o banco a qualquer momento, utilize `npm run db:reset`.*
 
-Para resetar tudo do zero: `npm run db:reset`.
+### 3. Configurando o Frontend
 
----
-
-## 3. Rodando o Frontend
+Abra um novo terminal, acesse a pasta do frontend e inicialize a interface:
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env      # confirme que VITE_API_URL aponta pro backend
-npm run dev                # abre em http://localhost:5173
+cp .env.example .env  # Certifique-se de que a VITE_API_URL aponta para o backend (porta 3000)
+npm run dev           # Inicia o app em http://localhost:5173
+
 ```
 
 ---
 
-## 4. O que foi implementado (checklist do enunciado)
+## Decisões de Arquitetura e Regras de Negócio
 
-**Perfis e permissões**
-- [x] 3 tipos de usuário: Administrador, Bibliotecário, Leitor
-- [x] Administrador: CRUD completo de usuários (define o tipo), CRUD de livros, visualiza tudo, realiza empréstimo/devolução
-- [x] Bibliotecário: CRUD de livros e leitores, empréstimos/devoluções, histórico, atrasados — sem excluir usuários do sistema
-- [x] Leitor: login, vê livros disponíveis, busca, vê **apenas seus próprios** empréstimos e histórico
+Durante o desenvolvimento, algumas escolhas foram feitas para garantir a consistência dos dados e simplificar a lógica de negócios:
 
-**Autenticação**
-- [x] Login com JWT (`/auth/login`)
-- [x] Rotas protegidas por token + perfil (`verificarToken` + `autorizar([...])`)
-- [x] Secret e demais configs em `.env` (nada mais hardcoded)
-
-**Livros** — título, autor, editora, ano, categoria, ISBN, qtd_total, qtd_disponível, status
-- [x] CRUD completo + busca por título/autor/categoria/ISBN + filtro de disponibilidade
-
-**Leitores** — nome, CPF/RA, e-mail, telefone, endereço, status (Ativo/Inativo)
-- [x] CRUD completo + busca por nome/CPF/RA + inativar/ativar + histórico de empréstimos
-
-**Empréstimos**
-- [x] Vínculo com leitor, livro, datas, status (`Em aberto`, `Devolvido`, `Atrasado`)
-- [x] Regras: só empresta com estoque disponível; leitor inativo é bloqueado; estoque
-      é decrementado/incrementado automaticamente; status "Atrasado" calculado
-      dinamicamente; leitor só vê os próprios empréstimos
-- [x] Filtros por status, leitor e intervalo de datas
-
-**Swagger** — documentação completa em `/api-docs`, com todas as rotas, métodos, parâmetros e corpo de requisição documentados via JSDoc nas próprias rotas.
-
-**Frontend React**
-- [x] Telas de login, livros, leitores, usuários do sistema (Admin) e empréstimos
-- [x] Consumo completo da API, navegação condicional por perfil
-- [x] Paleta de cores terrosa (bege, marrom, terracota, oliva)
+* **Mapeamento de Empréstimos (1:1):** Para facilitar auditorias e devoluções individuais, cada registro na tabela `Emprestimo` vincula exatamente um leitor a um livro. Caso um usuário pegue mais de um livro emprestado, o sistema gera múltiplos registros independentes em vez de uma lista na mesma linha.
+* **Separação de Usuários e Leitores:** O sistema trata a equipe interna (`Usuario` - Admin/Bibliotecário) separadamente dos alunos (`Leitor`). Isso isola as permissões de acesso e mantém a tabela de leitores limpa, contendo apenas dados pertinentes (como CPF/RA e status de ativação).
+* **Cálculo Dinâmico de Atrasos:** Em vez de rodar rotinas ou cronjobs agendados na máquina, o status de `Atrasado` é calculado em tempo real nas consultas. Se o empréstimo continua aberto e a data prevista de entrega expirou, o backend injeta o status atualizado na resposta da API.
+* **Acesso Simplificado:** Leitores cadastrados sem uma senha explícita utilizam o próprio número de CPF/RA como credencial inicial de login, facilitando testes e homologações.
 
 ---
 
-## 5. Decisões de projeto (vale explicar na apresentação)
+## Escopo Implementado
 
-- **Um empréstimo = um livro.** O enunciado menciona "associar empréstimo a um ou
-  mais livros"; optamos por manter 1 registro de `Emprestimo` por livro (mais simples
-  de auditar/devolver individualmente). Emprestar vários livros ao mesmo leitor = criar
-  vários registros de empréstimo. Isso está refletido no modelo (`livro_id` único por empréstimo).
-- **Usuários do sistema vs. Leitores são tabelas separadas** (`Usuario` para
-  Administrador/Bibliotecário, `Leitor` para alunos), como já estava no projeto original.
-  Isso facilita ter regras de acesso e campos diferentes (leitor tem CPF/RA e status
-  ativo/inativo; usuário do sistema tem só nome/email/senha/tipo).
-- **Status "Atrasado"** é recalculado dinamicamente a cada leitura (sem exigir um job
-  agendado): se um empréstimo está "Em aberto" e a data prevista já passou, ele passa a
-  ser "Atrasado" automaticamente ao listar.
-- Senha padrão de leitores cadastrados sem senha explícita = o próprio CPF/RA (fica fácil
-  de logar para teste/demo).
+* **Níveis de Permissão (RBAC):** Rotas protegidas por JWT (`verificarToken` + `autorizar`). O **Admin** possui controle total do sistema; o **Bibliotecário** gerencia o acervo, leitores e movimentações (sem permissão para excluir usuários); o **Leitor** realiza buscas de livros e visualiza apenas o próprio histórico.
+* **Módulo de Empréstimos:** Validações automatizadas impedem locações para leitores inativos ou de livros sem estoque. O fluxo atualiza a quantidade disponível no acervo de forma automática durante as saídas e devoluções.
+* **Filtros Avançados:** Busca textual em livros (por título, autor, categoria e ISBN) e relatórios de empréstimos filtrados por status ou intervalo de datas.
+* **Interface customizada:** Frontend construído em React utilizando uma paleta de cores terrosa (bege, marrom, terracota e oliva) voltada à identidade visual de bibliotecas.
 
-  ## 6. Tecnologias e Ferramentas
+```
 
-- **Backend:** Node.js, Express, Sequelize ORM, PostgreSQL, JWT (Json Web Token), Swagger UI.
-- **Frontend:** React, Vite, JavaScript (ES6+), Context API / Axios.# Biblioteca-projeto
+```
