@@ -101,6 +101,3 @@ Durante o desenvolvimento, algumas escolhas foram feitas para garantir a consist
 * **Filtros Avançados:** Busca textual em livros (por título, autor, categoria e ISBN) e relatórios de empréstimos filtrados por status ou intervalo de datas.
 * **Interface customizada:** Frontend construído em React utilizando uma paleta de cores terrosa (bege, marrom, terracota e oliva) voltada à identidade visual de bibliotecas.
 
-```
-
-```
