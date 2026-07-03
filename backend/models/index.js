@@ -11,7 +11,14 @@ const db = {};
 
 let sequelize;
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  const databaseUrl = process.env[config.use_env_variable];
+
+  if (databaseUrl) {
+    sequelize = new Sequelize(databaseUrl, config);
+  } else {
+    console.warn(`${config.use_env_variable} não configurado. Configure essa variável para usar o banco em produção.`);
+    sequelize = new Sequelize('postgres://missing:missing@localhost:5432/missing', config);
+  }
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }

@@ -39,6 +39,7 @@ export default function Dashboard() {
     <div className="pagina">
       <h1>Bem-vindo(a), {usuario.nome}! </h1>
       <p className="texto-suave">Perfil: {usuario.tipo}</p>
+      <h2>Relatório geral do sistema</h2>
 
       {carregando ? (
         <p>Carregando resumo...</p>

@@ -1,103 +1,233 @@
-Aqui está o conteúdo completo em Markdown, limpo, sem o excesso de emojis e pronto para você copiar e colar direto no seu arquivo `README.md`:
+# Sistema de Gerenciamento de Biblioteca - Projeto 2
 
-```markdown
-# Sistema de Gerenciamento de Biblioteca (Projeto II)
+**Vídeo de apresentação:** [assistir no Google Drive](https://drive.google.com/file/d/1NM5cRlOY1_OMQ_hiSOK9dVY2etLwG-Dr/view)
 
-Este projeto foi desenvolvido como requisito avaliativo para a disciplina de Desenvolvimento Backend na UTFPR. A aplicação consiste em um sistema completo de gerenciamento de biblioteca, unindo uma API REST robusta a uma interface SPA dinâmica e responsiva.
+## Integrantes
 
-O objetivo principal foi aplicar na prática conceitos de arquitetura de software, controle de acesso baseado em funções (RBAC), persistência de dados relaciais e consumo de APIs seguras.
+- Lucas Gabriel Pinheiro dos Santos
+- Rafael Moreira Rosa
 
----
+Aplicação web completa para gerenciamento de uma biblioteca, desenvolvida com API REST em Node.js/Express, banco relacional com Sequelize, autenticação JWT, documentação Swagger e frontend em React.
 
-## Tecnologias Utilizadas
+## Tecnologias
 
-* **Backend:** Node.js, Express, Sequelize ORM, PostgreSQL, JWT (JSON Web Token) e Swagger UI.
-* **Frontend:** React (Vite), JavaScript (ES6+), Axios e Context API.
+**Backend**
 
----
+- Node.js
+- Express
+- Sequelize
+- PostgreSQL
+- JWT
+- Swagger
 
-## Estrutura do Repositório
+**Frontend**
+
+- React
+- Vite
+- Axios
+- React Router
+- Context API
+
+## Estrutura
 
 ```text
-biblioteca-projeto2/
-├── backend/      # API REST (Express + Sequelize)
-└── frontend/     # Interface em React (Vite)
-
+backend/      API REST em Express
+frontend/     Interface em React
+api/          Handler serverless para deploy na Vercel
+vercel.json   Configuração de build, rotas e deploy
 ```
 
----
+## Perfis de Acesso
 
-## Como Executar o Projeto
+O sistema possui três perfis:
 
-### 1. Pré-requisitos
+- **Administrador:** acesso completo ao sistema, incluindo usuários, livros, leitores, empréstimos e devoluções.
+- **Bibliotecário:** gerencia livros, leitores, empréstimos e devoluções, sem acesso à gestão de usuários internos.
+- **Leitor:** consulta livros e visualiza apenas seus próprios empréstimos.
 
-* Node.js (versão 18 ou superior)
-* PostgreSQL rodando localmente (caso prefira utilizar MySQL, altere o `DB_DIALECT` para `mysql` e instale o pacote `mysql2`).
+## Funcionalidades Implementadas
 
-### 2. Configurando o Backend
+- Login com JWT.
+- Controle de acesso por perfil.
+- CRUD de usuários internos.
+- CRUD de livros.
+- CRUD de leitores.
+- Inativação e reativação de leitores.
+- Registro de empréstimos.
+- Registro de devoluções.
+- Atualização automática da quantidade disponível dos livros.
+- Bloqueio de empréstimo para leitor inativo.
+- Bloqueio de empréstimo quando não há exemplares disponíveis.
+- Identificação de empréstimos atrasados.
+- Histórico de empréstimos por leitor.
+- Filtros de livros por busca geral, categoria e disponibilidade.
+- Filtros de leitores por nome, CPF/RA e status.
+- Filtros de empréstimos por leitor, status e intervalo de datas.
+- Dashboard com resumo geral do sistema.
+- Documentação Swagger.
 
-Navegue até a pasta do backend, instale as dependências e configure as variáveis de ambiente:
+## Decisões de Arquitetura
 
-```bash
-cd backend
-npm install
-cp .env.example .env  # Abra o arquivo .env e insira as credenciais do seu banco
+### Empréstimos com um livro por registro
 
+Cada registro de empréstimo associa um leitor a um livro. Quando um leitor pega mais de um livro, o sistema registra múltiplos empréstimos independentes. Essa decisão simplifica a devolução individual, o controle de estoque e a auditoria do histórico.
+
+### Separação entre usuários internos e leitores
+
+Administradores e bibliotecários ficam na tabela de usuários do sistema. Leitores ficam em uma tabela própria, com CPF/RA, telefone, endereço e status. Essa separação deixa o controle de permissões mais claro.
+
+### Cálculo de atrasos
+
+O status de atraso é recalculado nas consultas de empréstimos. Se a data prevista de devolução já passou e o empréstimo ainda está em aberto, o sistema marca o registro como atrasado.
+
+## Contas de Demonstração
+
+Senha padrão:
+
+```text
+123456
 ```
-
-Com o banco de dados vazio criado (exemplo: `biblioteca-bd`), execute as migrações e os seeds para popular as tabelas iniciais:
-
-```bash
-npx sequelize-cli db:create  # Opcional, caso o banco ainda não exista
-npm run migrate             # Cria a estrutura de tabelas
-npm run seed                # Insere dados obrigatórios de teste
-npm run dev                 # Inicia o servidor local
-
-```
-
-* **API Local:** `http://localhost:3000`
-* **Documentação Swagger:** `http://localhost:3000/api-docs`
-
-#### Contas de Teste (Senha padrão: `123456`)
 
 | Perfil | E-mail |
-| --- | --- |
-| **Administrador** | admin@biblioteca.com |
-| **Bibliotecário** | bibliotecario@biblioteca.com |
-| **Leitor** | ana.souza@aluno.com |
-| **Leitor** | bruno.lima@aluno.com |
+|---|---|
+| Administrador | admin@biblioteca.com |
+| Bibliotecário | bibliotecario@biblioteca.com |
+| Leitor | ana.souza@aluno.com |
+| Leitor | bruno.lima@aluno.com |
 
-*Nota: O seed também cadastra 3 livros iniciais para demonstração. Se precisar resetar o banco a qualquer momento, utilize `npm run db:reset`.*
+## Como Executar Localmente
 
-### 3. Configurando o Frontend
+### 1. Backend
 
-Abra um novo terminal, acesse a pasta do frontend e inicialize a interface:
+Entre na pasta do backend:
 
-```bash
-cd frontend
+```powershell
+cd backend
 npm install
-cp .env.example .env  # Certifique-se de que a VITE_API_URL aponta para o backend (porta 3000)
-npm run dev           # Inicia o app em http://localhost:5173
-
 ```
 
----
+Crie o arquivo `.env` com base em `.env.example`:
 
-## Decisões de Arquitetura e Regras de Negócio
+```env
+PORT=3000
 
-Durante o desenvolvimento, algumas escolhas foram feitas para garantir a consistência dos dados e simplificar a lógica de negócios:
+DB_HOST=localhost
+DB_PORT=5432
+DB_DATABASE=biblioteca_bd
+DB_USERNAME=postgres
+DB_PASSWORD=sua_senha_local
+DB_DIALECT=postgres
 
-* **Mapeamento de Empréstimos (1:1):** Para facilitar auditorias e devoluções individuais, cada registro na tabela `Emprestimo` vincula exatamente um leitor a um livro. Caso um usuário pegue mais de um livro emprestado, o sistema gera múltiplos registros independentes em vez de uma lista na mesma linha.
-* **Separação de Usuários e Leitores:** O sistema trata a equipe interna (`Usuario` - Admin/Bibliotecário) separadamente dos alunos (`Leitor`). Isso isola as permissões de acesso e mantém a tabela de leitores limpa, contendo apenas dados pertinentes (como CPF/RA e status de ativação).
-* **Cálculo Dinâmico de Atrasos:** Em vez de rodar rotinas ou cronjobs agendados na máquina, o status de `Atrasado` é calculado em tempo real nas consultas. Se o empréstimo continua aberto e a data prevista de entrega expirou, o backend injeta o status atualizado na resposta da API.
-* **Acesso Simplificado:** Leitores cadastrados sem uma senha explícita utilizam o próprio número de CPF/RA como credencial inicial de login, facilitando testes e homologações.
+JWT_SECRET=troque_por_um_segredo_forte
+JWT_EXPIRES_IN=2h
+```
 
----
+Com o banco `biblioteca_bd` criado no PostgreSQL, rode:
 
-## Escopo Implementado
+```powershell
+npm run migrate
+npm run seed
+npm run dev
+```
 
-* **Níveis de Permissão (RBAC):** Rotas protegidas por JWT (`verificarToken` + `autorizar`). O **Admin** possui controle total do sistema; o **Bibliotecário** gerencia o acervo, leitores e movimentações (sem permissão para excluir usuários); o **Leitor** realiza buscas de livros e visualiza apenas o próprio histórico.
-* **Módulo de Empréstimos:** Validações automatizadas impedem locações para leitores inativos ou de livros sem estoque. O fluxo atualiza a quantidade disponível no acervo de forma automática durante as saídas e devoluções.
-* **Filtros Avançados:** Busca textual em livros (por título, autor, categoria e ISBN) e relatórios de empréstimos filtrados por status ou intervalo de datas.
-* **Interface customizada:** Frontend construído em React utilizando uma paleta de cores terrosa (bege, marrom, terracota e oliva) voltada à identidade visual de bibliotecas.
+API local:
 
+```text
+http://localhost:3000
+```
+
+Swagger local:
+
+```text
+http://localhost:3000/api-docs
+```
+
+### 2. Frontend
+
+Em outro terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend local:
+
+```text
+http://localhost:5173
+```
+
+## Deploy na Vercel
+
+O projeto possui configuração para publicar o frontend e expor a API pelo prefixo `/api`.
+
+No ambiente de produção, o frontend usa automaticamente:
+
+```text
+/api
+```
+
+Assim, uma chamada como:
+
+```text
+/auth/login
+```
+
+no desenvolvimento local vira:
+
+```text
+http://localhost:3000/auth/login
+```
+
+e no deploy vira:
+
+```text
+/api/auth/login
+```
+
+### Variáveis necessárias na Vercel
+
+Para o deploy funcionar com login e banco de dados, configure no painel da Vercel:
+
+```env
+DATABASE_URL=postgres://usuario:senha@host:porta/banco
+JWT_SECRET=um_segredo_forte_para_producao
+JWT_EXPIRES_IN=2h
+DB_DIALECT=postgres
+```
+
+Sem `DATABASE_URL` e `JWT_SECRET`, a interface pode abrir, mas a autenticação e as rotas da API não funcionarão corretamente.
+
+Swagger no deploy:
+
+```text
+/api/api-docs
+```
+
+## Scripts Principais
+
+Backend:
+
+```powershell
+npm run dev
+npm run migrate
+npm run seed
+npm run db:reset
+```
+
+Frontend:
+
+```powershell
+npm run dev
+npm run build
+```
+
+## Observações para Avaliação
+
+- O sistema usa JWT para proteger as rotas da API.
+- O controle de acesso por perfil é aplicado no backend e no frontend.
+- O Leitor não acessa usuários, leitores ou operações administrativas.
+- O Bibliotecário opera livros, leitores e empréstimos, mas não gerencia usuários internos.
+- O Administrador possui acesso completo.
+- O modelo de empréstimos registra um livro por empréstimo para facilitar devoluções e rastreabilidade.

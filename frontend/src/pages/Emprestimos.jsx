@@ -23,6 +23,7 @@ export default function Emprestimos() {
   const [erro, setErro] = useState('');
 
   const [statusFiltro, setStatusFiltro] = useState('');
+  const [leitorFiltro, setLeitorFiltro] = useState('');
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
 
@@ -36,6 +37,7 @@ export default function Emprestimos() {
     try {
       const params = {};
       if (statusFiltro) params.status = statusFiltro;
+      if (podeGerenciar && leitorFiltro) params.leitor_id = leitorFiltro;
       if (dataInicio) params.data_inicio = dataInicio;
       if (dataFim) params.data_fim = dataFim;
 
@@ -107,6 +109,16 @@ export default function Emprestimos() {
       </div>
 
       <div className="barra-filtros">
+        {podeGerenciar && (
+          <select value={leitorFiltro} onChange={(e) => setLeitorFiltro(e.target.value)}>
+            <option value="">Todos os leitores</option>
+            {leitores.map((leitor) => (
+              <option key={leitor.id} value={leitor.id}>
+                {leitor.nome} ({leitor.cpf_ra})
+              </option>
+            ))}
+          </select>
+        )}
         <select value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
           <option value="">Todos os status</option>
           <option value="Em aberto">Em aberto</option>
